@@ -1,0 +1,61 @@
+  Framework Recommendation
+
+  Switch from Spring Boot to JavaFX + Networking Libraries
+  - JavaFX for GUI and game rendering
+  - Java NIO or Netty for multiplayer networking
+  - LWJGL for advanced graphics (optional)
+
+  Game Architecture Ideas
+
+  Core Components
+
+  1. Game Engine Layer
+    - Game loop with fixed timestep
+    - Entity-Component-System (ECS) architecture
+    - Physics system for movement/collision
+    - Rendering system
+  2. Player System
+    - Player entity with position, health, inventory
+    - Movement mechanics (WASD, mouse look)
+    - Weapon handling and shooting mechanics
+  3. Map System
+    - Static map geometry (walls, cover points)
+    - Spawn points for both teams
+    - Bomb sites (A/B) with interaction zones
+  4. Networking Layer
+    - Client-server architecture
+    - Game state synchronization
+    - Anti-cheat basics (server-side validation)
+
+  Simplified Game Modes
+
+  Start with Team Deathmatch:
+  - Two teams spawn and fight
+  - Simple respawn system
+  - Score tracking
+
+  Later add Bomb Defusal:
+  - Terrorists plant bomb at sites
+  - Counter-terrorists defuse
+  - Round-based gameplay
+
+  Technical Implementation Strategy
+
+  1. Phase 1: Single-player prototype with basic movement and shooting
+  2. Phase 2: Add simple AI enemies
+  3. Phase 3: Implement networking for 2-4 players
+  4. Phase 4: Add game modes and polish
+
+  Project Structure Suggestion
+
+  src/main/java/com/yen/cs/
+  ├── engine/          # Game engine core
+  ├── entities/        # Players, weapons, projectiles
+  ├── graphics/        # Rendering and UI
+  ├── network/         # Client/server networking
+  ├── physics/         # Collision detection
+  ├── gamemode/        # Different game modes
+  └── CSGame.java      # Main game class
+
+  This approach keeps the scope manageable while creating a foundation for a more
+  complex game.
