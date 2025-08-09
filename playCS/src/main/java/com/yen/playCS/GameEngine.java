@@ -58,7 +58,7 @@ public class GameEngine {
         projectiles.removeIf(projectile -> {
             projectile.update();
             return projectile.isOutOfBounds(width, height) || 
-                   gameWorld.checkCollision(projectile.getX(), projectile.getY());
+                   gameWorld.checkProjectileCollision(projectile.getX(), projectile.getY());
         });
     }
     
@@ -70,6 +70,20 @@ public class GameEngine {
         if (pressedKeys.contains(KeyEvent.VK_S)) deltaY += 1;
         if (pressedKeys.contains(KeyEvent.VK_A)) deltaX -= 1;
         if (pressedKeys.contains(KeyEvent.VK_D)) deltaX += 1;
+        
+        // Map switching keys
+        if (pressedKeys.contains(KeyEvent.VK_1)) {
+            gameWorld.switchMap("dust2");
+            pressedKeys.remove(KeyEvent.VK_1); // Prevent spam
+        }
+        if (pressedKeys.contains(KeyEvent.VK_2)) {
+            gameWorld.switchMap("office");
+            pressedKeys.remove(KeyEvent.VK_2);
+        }
+        if (pressedKeys.contains(KeyEvent.VK_3)) {
+            gameWorld.switchMap("mirage");
+            pressedKeys.remove(KeyEvent.VK_3);
+        }
         
         player.move(deltaX, deltaY, gameWorld);
     }
@@ -87,10 +101,21 @@ public class GameEngine {
     
     private void renderUI(Graphics2D g2d) {
         g2d.setColor(Color.WHITE);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 14));
         g2d.drawString("Health: " + player.getHealth(), 10, 20);
         g2d.drawString("Ammo: " + player.getAmmo(), 10, 35);
         g2d.drawString("Position: (" + (int)player.getX() + ", " + (int)player.getY() + ")", 10, 50);
         
+        // Map controls info
+        g2d.setColor(Color.YELLOW);
+        g2d.setFont(new Font("Arial", Font.PLAIN, 12));
+        g2d.drawString("Maps: [1] Dust2  [2] Office  [3] Mirage", 10, height - 20);
+        
+        // Spawn points info
+        g2d.setColor(Color.CYAN);
+        g2d.drawString("Blue circles: CT spawn  |  Red circles: T spawn  |  Orange areas: Bomb sites", 10, height - 40);
+        
+        // Crosshair
         g2d.setColor(Color.RED);
         int crosshairSize = 10;
         int centerX = width / 2;

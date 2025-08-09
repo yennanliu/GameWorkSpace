@@ -27,4 +27,23 @@ public class PlayCsApplicationTests {
         assertTrue("Should collide with boundary walls", world.checkCollision(5, 5));
         assertFalse("Should not collide in open area", world.checkCollision(400, 300));
     }
+    
+    @Test
+    public void testMapSwitching() {
+        GameWorld world = new GameWorld(800, 600, "dust2");
+        assertEquals("dust2", world.getMapName());
+        
+        world.switchMap("office");
+        assertEquals("office", world.getMapName());
+        
+        world.switchMap("mirage");
+        assertEquals("mirage", world.getMapName());
+    }
+    
+    @Test
+    public void testSpawnPoints() {
+        GameWorld world = new GameWorld(800, 600, "dust2");
+        assertFalse("Should have spawn points", world.getSpawnPoints().isEmpty());
+        assertTrue("Should have bomb sites", world.getBombSites().size() >= 2);
+    }
 }
