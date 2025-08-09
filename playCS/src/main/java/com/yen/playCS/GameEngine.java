@@ -18,6 +18,7 @@ public class GameEngine {
     private Set<Integer> pressedKeys;
     private List<Projectile> projectiles;
     private List<AIEnemy> aiEnemies;
+    private VisualEffects visualEffects;
     private Random random;
     private long lastEnemySpawn;
     private static final long ENEMY_RESPAWN_DELAY = 5000; // 5 seconds
@@ -28,6 +29,7 @@ public class GameEngine {
         this.pressedKeys = new HashSet<>();
         this.projectiles = new ArrayList<>();
         this.aiEnemies = new ArrayList<>();
+        this.visualEffects = new VisualEffects();
         this.random = new Random();
         this.lastEnemySpawn = System.currentTimeMillis();
         
@@ -60,6 +62,8 @@ public class GameEngine {
         Projectile bullet = player.shoot();
         if (bullet != null) {
             projectiles.add(bullet);
+            // Add muzzle flash effect
+            visualEffects.addMuzzleFlash(player.getX(), player.getY(), player.getAngle());
         }
     }
     
@@ -69,6 +73,7 @@ public class GameEngine {
         updateProjectiles();
         checkCollisions();
         handleEnemyRespawn();
+        visualEffects.update();
     }
     
     private void updateAIEnemies() {
@@ -79,6 +84,10 @@ public class GameEngine {
             Projectile enemyBullet = enemy.tryShoot();
             if (enemyBullet != null) {
                 projectiles.add(enemyBullet);
+                // Add muzzle flash for AI
+                visualEffects.addMuzzleFlash(enemy.getX(), enemy.getY(), 
+                                           Math.atan2(player.getY() - enemy.getY(), 
+                                                    player.getX() - enemy.getX()));
             }
         }
     }
@@ -100,6 +109,8 @@ public class GameEngine {
             for (AIEnemy enemy : aiEnemies) {
                 if (enemy.isAlive() && enemy.contains(projectile.getX(), projectile.getY())) {
                     enemy.takeDamage(34); // Damage per hit
+                    visualEffects.addBloodEffect(projectile.getX(), projectile.getY());
+                    visualEffects.addBulletImpact(projectile.getX(), projectile.getY());
                     projectiles.remove(i);
                     break;
                 }
@@ -108,6 +119,7 @@ public class GameEngine {
             // Check hits on player (from AI projectiles)
             if (i < projectiles.size() && player.contains(projectile.getX(), projectile.getY())) {
                 player.takeDamage(25);
+                visualEffects.addBloodEffect(projectile.getX(), projectile.getY());
                 projectiles.remove(i);
             }
         }
@@ -180,6 +192,10 @@ public class GameEngine {
     }
     
     public void render(Graphics2D g2d) {
+        // Draw modern game background
+        ModernUI.drawGameBackground(g2d, width, height, gameWorld.getMapName());
+        
+        // Render game world elements
         gameWorld.render(g2d);
         
         // Render AI enemies
@@ -187,62 +203,29 @@ public class GameEngine {
             enemy.render(g2d);
         }
         
+        // Render player
         player.render(g2d);
         
+        // Render projectiles
         for (Projectile projectile : projectiles) {
             projectile.render(g2d);
         }
         
-        renderUI(g2d);
+        // Render visual effects
+        visualEffects.render(g2d);
+        
+        // Render modern UI
+        renderModernUI(g2d);
     }
     
-    private void renderUI(Graphics2D g2d) {
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.PLAIN, 14));
-        g2d.drawString("Health: " + player.getHealth(), 10, 20);
-        g2d.drawString("Ammo: " + player.getAmmo(), 10, 35);
-        g2d.drawString("Position: (" + (int)player.getX() + ", " + (int)player.getY() + ")", 10, 50);
-        
-        // AI Enemy info
+    private void renderModernUI(Graphics2D g2d) {
+        // Count alive enemies
         int aliveEnemies = 0;
         for (AIEnemy enemy : aiEnemies) {
             if (enemy.isAlive()) aliveEnemies++;
         }
-        g2d.drawString("Enemies: " + aliveEnemies + " alive", 10, 65);
         
-        // Enemy behavior legend
-        g2d.setColor(Color.ORANGE);
-        g2d.setFont(new Font("Arial", Font.PLAIN, 11));
-        g2d.drawString("Enemy Types: A=Aggressive, D=Defensive, P=Patrol", width - 250, 20);
-        
-        // Map controls info
-        g2d.setColor(Color.YELLOW);
-        g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-        g2d.drawString("Maps: [1] Dust2  [2] Office  [3] Mirage", 10, height - 20);
-        
-        // Game info
-        g2d.setColor(Color.CYAN);
-        g2d.drawString("Red enemies will hunt you! Shoot them before they shoot you!", 10, height - 40);
-        
-        // Player death message
-        if (player.getHealth() <= 0) {
-            g2d.setColor(Color.RED);
-            g2d.setFont(new Font("Arial", Font.BOLD, 32));
-            String gameOverText = "GAME OVER - You were eliminated!";
-            FontMetrics fm = g2d.getFontMetrics();
-            int textX = width/2 - fm.stringWidth(gameOverText)/2;
-            int textY = height/2;
-            g2d.drawString(gameOverText, textX, textY);
-        }
-        
-        // Crosshair
-        if (player.getHealth() > 0) {
-            g2d.setColor(Color.RED);
-            int crosshairSize = 10;
-            int centerX = width / 2;
-            int centerY = height / 2;
-            g2d.fillRect(centerX - crosshairSize/2, centerY - 1, crosshairSize, 2);
-            g2d.fillRect(centerX - 1, centerY - crosshairSize/2, 2, crosshairSize);
-        }
+        // Use the modern UI system
+        ModernUI.drawModernHUD(g2d, player, aliveEnemies, gameWorld.getMapName(), width, height);
     }
 }

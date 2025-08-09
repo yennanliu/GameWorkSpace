@@ -217,42 +217,140 @@ public class AIEnemy {
     public void render(Graphics2D g2d) {
         if (!isAlive) return;
         
-        // Draw enemy body
-        Color enemyColor = team == SpawnPoint.Team.TERRORIST ? Color.RED : Color.ORANGE;
-        g2d.setColor(enemyColor);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        
+        // Enemy body with behavior-specific colors
+        Color bodyColor, highlightColor;
+        switch (behavior) {
+            case AGGRESSIVE:
+                bodyColor = new Color(180, 0, 0);      // Dark red
+                highlightColor = new Color(220, 50, 50); // Bright red
+                break;
+            case DEFENSIVE:
+                bodyColor = new Color(140, 70, 0);      // Dark orange
+                highlightColor = new Color(200, 120, 50); // Bright orange
+                break;
+            case PATROL:
+                bodyColor = new Color(120, 0, 120);     // Purple
+                highlightColor = new Color(180, 50, 180); // Bright purple
+                break;
+            default:
+                bodyColor = Color.RED;
+                highlightColor = Color.PINK;
+        }
+        
+        // Create gradient for enemy body
+        GradientPaint bodyGradient = new GradientPaint(
+            (float)(x - ENEMY_SIZE/2), (float)(y - ENEMY_SIZE/2), highlightColor,
+            (float)(x + ENEMY_SIZE/2), (float)(y + ENEMY_SIZE/2), bodyColor
+        );
+        g2d.setPaint(bodyGradient);
         g2d.fillOval((int)(x - ENEMY_SIZE/2), (int)(y - ENEMY_SIZE/2), (int)ENEMY_SIZE, (int)ENEMY_SIZE);
         
-        // Draw weapon direction
-        g2d.setColor(Color.BLACK);
+        // Body border
+        g2d.setColor(bodyColor.darker());
         g2d.setStroke(new BasicStroke(2));
-        double gunLength = 20;
+        g2d.drawOval((int)(x - ENEMY_SIZE/2), (int)(y - ENEMY_SIZE/2), (int)ENEMY_SIZE, (int)ENEMY_SIZE);
+        
+        // Weapon (AK-47 style for terrorists)
+        g2d.setColor(new Color(40, 40, 40)); // Dark gun metal
+        g2d.setStroke(new BasicStroke(3));
+        double gunLength = 22;
         double gunEndX = x + Math.cos(angle) * gunLength;
         double gunEndY = y + Math.sin(angle) * gunLength;
         g2d.drawLine((int)x, (int)y, (int)gunEndX, (int)gunEndY);
         
-        // Draw health bar
+        // Gun details
+        g2d.setColor(new Color(60, 60, 60));
+        g2d.setStroke(new BasicStroke(1));
+        double gunDetailX = x + Math.cos(angle) * 15;
+        double gunDetailY = y + Math.sin(angle) * 15;
+        g2d.drawLine((int)gunDetailX, (int)gunDetailY, (int)gunEndX, (int)gunEndY);
+        
+        // Enemy sight indicator
+        g2d.setColor(Color.YELLOW);
+        double sightX = x + Math.cos(angle) * 8;
+        double sightY = y + Math.sin(angle) * 8;
+        g2d.fillOval((int)(sightX - 1), (int)(sightY - 1), 2, 2);
+        
+        // Draw enhanced health bar when damaged
         if (health < maxHealth) {
-            int barWidth = (int)ENEMY_SIZE;
-            int barHeight = 4;
-            int barX = (int)(x - barWidth/2);
-            int barY = (int)(y - ENEMY_SIZE/2 - 10);
-            
-            g2d.setColor(Color.RED);
-            g2d.fillRect(barX, barY, barWidth, barHeight);
-            
-            g2d.setColor(Color.GREEN);
-            int healthWidth = (int)((double)health / maxHealth * barWidth);
-            g2d.fillRect(barX, barY, healthWidth, barHeight);
+            drawEnemyHealthBar(g2d);
         }
         
-        // Draw behavior indicator
+        // Behavior indicator with modern styling
+        drawBehaviorIndicator(g2d);
+        
+        // Detection range indicator (when aggressive and close to player)
+        if (behavior == AIBehavior.AGGRESSIVE) {
+            drawDetectionRange(g2d);
+        }
+    }
+    
+    private void drawEnemyHealthBar(Graphics2D g2d) {
+        int barWidth = (int)ENEMY_SIZE + 4;
+        int barHeight = 5;
+        int barX = (int)(x - barWidth/2);
+        int barY = (int)(y - ENEMY_SIZE/2 - 12);
+        
+        // Background
+        g2d.setColor(new Color(60, 60, 60));
+        g2d.fillRoundRect(barX, barY, barWidth, barHeight, 3, 3);
+        
+        // Health fill with gradient
+        double healthPercent = (double)health / maxHealth;
+        Color healthColor = healthPercent > 0.6 ? new Color(0, 200, 0) : 
+                           healthPercent > 0.3 ? new Color(255, 165, 0) : new Color(220, 50, 50);
+        
+        g2d.setColor(healthColor);
+        int healthWidth = (int)(barWidth * healthPercent);
+        if (healthWidth > 0) {
+            g2d.fillRoundRect(barX, barY, healthWidth, barHeight, 3, 3);
+        }
+        
+        // Border
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(1));
+        g2d.drawRoundRect(barX, barY, barWidth, barHeight, 3, 3);
+    }
+    
+    private void drawBehaviorIndicator(Graphics2D g2d) {
+        // Background circle for behavior indicator
+        int indicatorSize = 16;
+        int indicatorX = (int)(x - indicatorSize/2);
+        int indicatorY = (int)(y + ENEMY_SIZE/2 + 8);
+        
+        // Behavior-specific background color
+        Color bgColor;
+        switch (behavior) {
+            case AGGRESSIVE: bgColor = new Color(255, 100, 100, 180); break;
+            case DEFENSIVE: bgColor = new Color(255, 165, 0, 180); break;
+            case PATROL: bgColor = new Color(200, 100, 255, 180); break;
+            default: bgColor = new Color(150, 150, 150, 180);
+        }
+        
+        g2d.setColor(bgColor);
+        g2d.fillOval(indicatorX, indicatorY, indicatorSize, indicatorSize);
+        
+        g2d.setColor(Color.WHITE);
+        g2d.setStroke(new BasicStroke(1));
+        g2d.drawOval(indicatorX, indicatorY, indicatorSize, indicatorSize);
+        
+        // Behavior letter
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 10));
-        String behaviorText = behavior.name().substring(0, 1); // First letter
+        String behaviorText = behavior.name().substring(0, 1);
         FontMetrics fm = g2d.getFontMetrics();
-        int textX = (int)(x - fm.stringWidth(behaviorText) / 2);
-        int textY = (int)(y + ENEMY_SIZE/2 + 15);
+        int textX = indicatorX + (indicatorSize - fm.stringWidth(behaviorText)) / 2;
+        int textY = indicatorY + indicatorSize - 4;
         g2d.drawString(behaviorText, textX, textY);
+    }
+    
+    private void drawDetectionRange(Graphics2D g2d) {
+        // Only show when aggressive and actively hunting
+        g2d.setColor(new Color(255, 0, 0, 30));
+        g2d.fillOval((int)(x - detectionRange/4), (int)(y - detectionRange/4), 
+                     (int)(detectionRange/2), (int)(detectionRange/2));
     }
     
     // Getters

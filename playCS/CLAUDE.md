@@ -27,6 +27,8 @@ src/
 │   │       ├── AIEnemy.java             # AI enemy with intelligent behaviors
 │   │       ├── GameWorld.java           # Enhanced map system with multiple layouts
 │   │       ├── Projectile.java          # Bullet/projectile system
+│   │       ├── VisualEffects.java       # Particle effects and visual enhancements
+│   │       ├── ModernUI.java            # Modern game UI and HUD system
 │   │       ├── MapElement.java          # Base class for all map elements
 │   │       ├── Wall.java                # Wall entities with different types
 │   │       ├── SpawnPoint.java          # Team spawn points (T/CT)
@@ -67,21 +69,37 @@ src/
 ## AI Enemy System
 
 - **3 AI Behavior Types**: 
-  - **Aggressive (A)**: Rushes player, fast movement, close-range combat
-  - **Defensive (D)**: Keeps distance, careful positioning, long-range shots
-  - **Patrol (P)**: Balanced approach, medium range engagement
+  - **Aggressive (A)**: Red gradient, rushes player, fast movement, close-range combat
+  - **Defensive (D)**: Orange gradient, keeps distance, careful positioning, long-range shots
+  - **Patrol (P)**: Purple gradient, balanced approach, medium range engagement
 - **Intelligent Pathfinding**: AI navigates around walls and obstacles
 - **Dynamic Targeting**: Enemies detect player within range and aim accurately
 - **Health & Damage System**: Enemies take damage, show health bars when wounded
 - **Smart Respawn**: Dead enemies respawn at terrorist spawn points after delay
 - **Combat Mechanics**: AI shoots with realistic inaccuracy and cooldowns
 
+## Modern Visual System
+
+- **Enhanced Graphics**: Anti-aliased rendering with gradient effects and modern styling
+- **Dynamic Backgrounds**: Map-specific textured backgrounds (Desert, Office, Mediterranean themes)
+- **Modern HUD**: Professional game UI with rounded progress bars and panels
+- **Visual Effects**: 
+  - **Muzzle flashes** for all weapons (player and AI)
+  - **Particle effects** for bullet impacts and blood
+  - **Health indicators** with color-coded progress bars
+  - **Behavior indicators** for AI enemies with themed colors
+- **Improved Player/Enemy Design**: Gradient-filled bodies with detailed weapons and directional indicators
+- **Professional Crosshair**: Multi-layer crosshair with outer ring and precise center dot
+- **Game Over Screen**: Modern overlay with professional styling and clear messaging
+
 ## Development Notes
 
 - Compatible with Java 8 (builds successfully with current environment)  
-- Uses standard Java Swing - no external game frameworks required
+- Uses standard Java Swing with advanced Graphics2D features
 - Enhanced collision detection system (separate for movement vs projectiles)
 - Object-oriented architecture with inheritance (MapElement base class)
 - AI system with behavior state machines and decision trees
+- Professional visual effects system with particle management
+- Modern UI framework for consistent game-like appearance
 - Comprehensive unit testing for all game components
 - Ready for Phase 3 expansion (multiplayer, game modes, weapons)

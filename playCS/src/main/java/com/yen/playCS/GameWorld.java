@@ -233,19 +233,10 @@ public class GameWorld {
     }
     
     public void render(Graphics2D g2d) {
-        // Render map background
-        g2d.setColor(new Color(34, 139, 34)); // Forest green background
-        g2d.fillRect(0, 0, width, height);
-        
-        // Render all map elements
+        // Render all map elements (background is now handled by ModernUI)
         for (MapElement element : mapElements) {
             element.render(g2d);
         }
-        
-        // Render map name
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 16));
-        g2d.drawString("Map: " + mapName.toUpperCase(), width - 150, 30);
     }
     
     public List<SpawnPoint> getSpawnPoints() { return spawnPoints; }
