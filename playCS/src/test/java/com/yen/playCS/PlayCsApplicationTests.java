@@ -46,4 +46,25 @@ public class PlayCsApplicationTests {
         assertFalse("Should have spawn points", world.getSpawnPoints().isEmpty());
         assertTrue("Should have bomb sites", world.getBombSites().size() >= 2);
     }
+    
+    @Test
+    public void testAIEnemyCreation() {
+        AIEnemy enemy = new AIEnemy(100, 100, SpawnPoint.Team.TERRORIST, AIEnemy.AIBehavior.AGGRESSIVE);
+        assertEquals(100.0, enemy.getX(), 0.1);
+        assertEquals(100.0, enemy.getY(), 0.1);
+        assertTrue("Enemy should be alive initially", enemy.isAlive());
+        assertEquals(SpawnPoint.Team.TERRORIST, enemy.getTeam());
+    }
+    
+    @Test
+    public void testAIEnemyDamage() {
+        AIEnemy enemy = new AIEnemy(100, 100, SpawnPoint.Team.TERRORIST, AIEnemy.AIBehavior.PATROL);
+        assertTrue("Enemy should be alive", enemy.isAlive());
+        
+        enemy.takeDamage(50);
+        assertTrue("Enemy should still be alive", enemy.isAlive());
+        
+        enemy.takeDamage(60);
+        assertFalse("Enemy should be dead", enemy.isAlive());
+    }
 }

@@ -67,6 +67,17 @@ public class Player {
         g2d.drawLine((int)x, (int)y, (int)gunEndX, (int)gunEndY);
     }
     
+    public void takeDamage(int damage) {
+        health -= damage;
+        if (health < 0) health = 0;
+    }
+    
+    public boolean contains(double px, double py) {
+        double dx = px - x;
+        double dy = py - y;
+        return Math.sqrt(dx * dx + dy * dy) <= PLAYER_SIZE / 2;
+    }
+    
     public double getX() { return x; }
     public double getY() { return y; }
     public int getHealth() { return health; }
